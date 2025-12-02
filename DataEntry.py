@@ -7,6 +7,12 @@ class DATAENTRY1:
     
     #学級データが存在しているとき
     def existstrue(self):
+        
+        def nemu_return():
+            print("処理を飛ばします。")
+            print("----------------------------------------------------------------")
+            print()
+            
         if os.path.exists(self.classroom):
             print("データが存在しています。")
             print("以下のどの操作を行いますか？(数字を入力)")
@@ -37,21 +43,22 @@ class DATAENTRY1:
                         for j in class_no:                                           
                             if number1==j[0]:
                                 print("そのNoは存在します。")
-                                print("メニューに戻ります。")
-                                print("----------------------------------------------------------------")                         
-                                    
-                            else:
-                                print("追加する",i,"人目の名前を入力してください。")
-                                name1=input("名前:")
-                                print("追加する",i,"人目の点数を入力してください。")
-                                score1=(input("点数:"))
-                                c.execute("INSERT INTO product VALUES(?,?,?)",(number1,name1,score1))
-                            
+                                return nemu_return()                         
+                                                                  
                     except ValueError:
                         print("入力した文字が間違っています。処理を飛ばします。")
                         print("----------------------------------------------------------------")
                         print()
                         continue
+                
+                    print("追加する",i,"人目の名前を入力してください。")
+                    name1=input("名前:")
+                    print("追加する",i,"人目の点数を入力してください。")
+                    score1=(input("点数:"))
+                    print("----------------------------------------------------------------")
+                    c.execute("INSERT INTO product VALUES(?,?,?)",(number1,name1,score1))
+                    conn.commit()
+                
                 
                 print("----------------------------------------------------------------")
                 print("一覧表を表示します。")
@@ -67,7 +74,7 @@ class DATAENTRY1:
             elif num1==2:
                 print("一覧表を表示します。")
                 print("(No,名前,点数)")
-                itr=c.execute("SELECT * FROM product")
+                itr=c.execute("SELECT * FROM product ORDER BY No")
                 for row in itr:
                     print(row) 
                 print("----------------------------------------------------------------")
@@ -110,36 +117,46 @@ class DATAENTRY1:
     def existsfalse(self):
         if os.path.exists(self.classroom)==False:
             print("データが存在しません。新しいデータを作成します。")
+            print("何人のデータを追加しますか？(数字を入力)")        
+            num2=int(input("入力:"))
+            print("----------------------------------------------------------------")            
+            
             cr2=self.classroom
             conn=sqlite3.connect(cr2)
             c=conn.cursor()
             c.execute("CREATE TABLE product(No INT,name CHAR(20),score CHAR(20))")
+            try:
+                for i in range(1,num2+1):
+                    try:
+                        number=i
+                        print(i,"人目の名前を入力してください。")
+                        name=input("名前:")
+                        print(i,"人目の点数を入力してください。")
+                        score=(input("点数:"))
+                        c.execute("INSERT INTO product VALUES(?,?,?)",(number,name,score))
+                    
+                    except ValueError:
+                        print("入力した文字が間違っています。処理を飛ばします。")
+                        print()
+                        continue
+                            
+                conn.commit()
             
-            print("何人のデータを追加しますか？(数字を入力)")        
-            num2=int(input("入力:"))
-            print("----------------------------------------------------------------")
-            for i in range(1,num2+1):
-                try:
-                    number=i
-                    print(i,"人目の名前を入力してください。")
-                    name=input("名前:")
-                    print(i,"人目の点数を入力してください。")
-                    score=(input("点数:"))
-                    c.execute("INSERT INTO product VALUES(?,?,?)",(number,name,score))
-                except ValueError:
-                    print("入力した文字が間違っています。処理を飛ばします。")
-                    print()
-                    continue
-                          
-            conn.commit()
-           
-            print("----------------------------------------------------------------")
-            print("一覧表を表示します。")
-            print("(No,名前,点数)")
-            itr=c.execute("SELECT * FROM product ORDER BY No")
-            for row in itr:
-                print(row)
-            print("----------------------------------------------------------------")
-            print()
+                print("----------------------------------------------------------------")
+                print("一覧表を表示します。")
+                print("(No,名前,点数)")
+                itr=c.execute("SELECT * FROM product ORDER BY No")
+                for row in itr:
+                    print(row)
+                print("----------------------------------------------------------------")
+                print()
+                
+                conn.close()
             
-            conn.close()
+            except ValueError:
+                print("入力した文字が間違っています。処理を飛ばします。")
+                print("----------------------------------------------------------------")
+                conn.commit()
+                conn.close()
+                print()
+            

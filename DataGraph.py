@@ -48,13 +48,14 @@ class DATAGRAPH1:
                     del scorefile[:]
 
                 print("----------------------------------------------------------------")
+                #平均点の一覧表を表示
                 for data1 in zip(schoolyearfile,comparisonfile):
                     d1=str(data1[0])
                     d2=d1.replace(".db","")
                     classname.append(d2)
                     print(d2,"の平均点は",data1[1],"です。")
                 print("----------------------------------------------------------------")
-
+                #グラフを作成
                 plt.rcParams["font.family"]="MS GOTHIC"
                 plt.bar(classname,comparisonfile)
                 plt.xlabel("クラス")
