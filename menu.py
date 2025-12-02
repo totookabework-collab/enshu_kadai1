@@ -1,99 +1,80 @@
+#11/26の宮田講師報告時から追加した機能
+#例外処理:入力文字が間違っているとメッセージを出しメニューへ
+#データ追加時に順番が変わってしまう可能性を考え、ソート機能を各所に追加
+
+#データの追加時、既存のNoと重複している場合、メッセージを出し入力できないようにする
+#メッセージの修正
+#ループ中に間違った文字を入力すると、その処理を飛ばし、継続して入力可能にした
+#「データ確認」と「データ削除」を別ファイルに分割(データ入力は元々分割していた)
+#「平均点グラフ作成」の欄を追加
+
 import DataEntry
-import sqlite3
-import os
+import DataConfirmation
+import DataDelete
+import DataGraph
 
 while True:
-    print("成績表:どの操作を行いますか？")
-    print("数字を入力してください。(1~4)")
-    print("1.データ確認 / 2.データ入力 / 3.データ削除 / 4.終了")
-    menu=int(input())
+    try:
+        #ビュー?
+        print("成績表:どの操作を行いますか？")
+        print("数字を入力してください。(1~4)")
+        print("1.データ確認 / 2.データ入力 / 3.データ削除 / 4.平均点グラフ(test) / 5.終了")
+        menu=int(input("入力："))
+        print("----------------------------------------------------------------")
 
-    #1.データ確認
-    if menu==1:
-        print("表示したいクラス名を入力してください。(例：1-A)")
-        classroom1=input("")
-        classroom1=classroom1+".db"
-        if os.path.exists(classroom1):
-            conn=sqlite3.connect(classroom1)
-            c=conn.cursor()
-            print("一覧表を表示します。")
-            print("(No,名前,点数)")
-            itr=c.execute("SELECT * FROM product")
-            for row in itr:
-                print(row)
+        #コントローラー?
+        #1.データ確認
+        if menu==1:
+            print("表示したいクラス名を入力してください。(例：1-A)")
+            classroom1=input("入力:")
+            print("----------------------------------------------------------------")
+            classroom1=classroom1+".db"
+            dc1=DataConfirmation.DATACONFIRMATION1(classroom1)
+            dc1.dataconfirmaition1()
             print()
-            conn.commit()
-            conn.close()
-            
-        else:
-            print(classroom1,"のデータはありません。")
+                
+        #2.データ入力
+        elif menu==2:
+            print("クラス名を選択してください。(例：1-A)")
+            classroom2=input("入力:")
+            print("----------------------------------------------------------------")
+            classroom2=classroom2+".db"
+            de1=DataEntry.DATAENTRY1(classroom2)
+            de1.existstrue()
+            de1.existsfalse()
             print()
-    #2.データ入力
-    elif menu==2:
-        print("クラス名を選択してください。(例：1-A)")
-        classroom2=input()
-        classroom2=classroom2+".db"
-        de1=DataEntry.DATAENTRY1(classroom2)
-        de1.existstrue()
-        de1.existsfalse()
-        print()
-    
-    #3.データ削除    
-    elif menu==3:
-        print("削除方法を選択してください。(1~2)")
-        print("1.選択削除 / 2.全クラスデータ削除")
-        delno=int(input())
-        if delno==1:
-            print("どのクラスデータを削除しますか？(例：1-A)")
-            classdel1=input("")
-            print(classdel1,"のデータを削除して本当に良いですか?(YES=yを入力/NO=nを入力)")
-            classdel2=input()
-            if classdel2=="y":
-                curdir=os.listdir(".")
-                for cd1 in curdir:
-                    if cd1==classdel1+".db":                    
-                        os.remove(cd1)
-                print(classdel1,"のクラスデータを削除しました。")
-                print()
-            elif classdel2=="n":
-                print("メニューに戻ります。")
-                print()
-
-            else:
-                print("入力された文字が間違っています。")
-                print("メニューに戻ります。")
-                print()
         
-        elif delno==2:
-            print("すべてのクラスデータを削除します。")
-            print("本当によろしいですか?(YES=yを入力/NO=nを入力)")
-            classdel=input()
-            if classdel=="y":
-                curdir=os.listdir(".")
-                for cd1 in curdir:
-                    cd2=cd1.endswith(".db")
-                    if cd2 is True:
-                        os.remove(cd1)
-                print("すべてのクラスデータを削除しました。")
-                print()
-            elif classdel=="n":
-                print("メニューに戻ります。")
-                print()
-
-            else:
-                print("入力された文字が間違っています。")
-                print("メニューに戻ります。")
-                print()
-        else:
-            print("入力された文字が間違っています。")
-            print("メニューに戻ります。")
+        #3.データ削除    
+        elif menu==3:
+            print("削除方法を選択してください。(数字を入力)")
+            print("1.選択削除 / 2.全クラスデータ削除 (1~2を入力)")
+            delno=int(input("入力:"))
+            print("----------------------------------------------------------------")
+            dd1=DataDelete.DATADELETE1(delno)
+            dd1.datadelete1()
             print()
-
-    #4.終了
-    elif menu==4:
-        print("プログラムを終了します。")
-        break
+            
+        #4.平均点グラフの作成
+        elif menu==4:
+            print("表示したい学年を入力してください。(数字を入力)")
+            sy0=input("入力:")
+            dg0=DataGraph.DATAGRAPH1(sy0)
+            dg0.datagraph1()
+            print()
+            
+        #5.終了
+        elif menu==5:
+            print("プログラムを終了します。")
+            break
+        
+        else:
+            print("入力した数字が間違っています。")
+            print("----------------------------------------------------------------")
+            print()
     
-    else:
-        print("入力した数字が間違っています。")
+    except ValueError:
+        print("入力した文字が間違っています。")
+        print("メニュー画面に戻ります。")
+        print("----------------------------------------------------------------")
+        print()
         print()
